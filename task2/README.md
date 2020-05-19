@@ -234,19 +234,6 @@ Interpret SMA and EMA:
 
 So I tested both SMA & EMA on 10-20, 20-50 and 50-200 setting and I found out that 20-50 EMA has the best performance.
 
-SMA 10-20 vs EMA 10-20
-![image](./report/BTC_USDT_1h_SMACross_10_20_2020-01-01_2020-04-01.png)
-![image](./report/BTC_USDT_1h_EMACross_10_20_2020-01-01_2020-04-01.png)
-
-SMA 20-50 vs EMA 20-50
-![image](./report/BTC_USDT_1h_SMACross_20_50_2020-01-01_2020-04-01.png)
-![image](./report/BTC_USDT_1h_EMACross_20_50_2020-01-01_2020-04-01.png)
-
-SMA 50-200 vs EMA 50-200
-![image](./report/BTC_USDT_1h_SMACross_50_200_2020-01-01_2020-04-01.png)
-![image](./report/BTC_USDT_1h_EMACross_50_200_2020-01-01_2020-04-01.png)
-
-
 #### 5/6
 
 Finished optional tasks, read through backtrader docs. 
@@ -256,3 +243,57 @@ Played some code in file `platform_concept_play.py`
 Finished section 2 task 2
 
 I believe there are a lot improvements I can make on the trading strategies such as market order vs limit order, stop loss, buy or sell at more specific points etc. I will update this task.
+
+#### 5/6 - 5/18
+
+I was on and off the project for a few days. 
+
+I took some time to read more about backtrader's doc. Understood more about Lines and datafeed. 
+
+Coporated btreport into task2.
+
+Reorganized folders. Wrote `run.py` to run all strategies. 
+
+New structure:
+
+```
+task2
+│   README.md
+│   requirements.txt 
+│   run.py
+│   data-fetcher.py
+│   report.py   -- btreport
+│   utils.py    -- btreport      
+└───data
+│       BTC_USDT_1h.csv
+└───log
+│       logfile
+└───report
+|       reportfile
+└───strategies
+│       strategy files
+└───templates   -- btreport
+        template files
+```
+
+Reviewed SMACross example and updated `run.py`
+
+Created [strategies](./strategies) folder to contain all strategies classes.
+
+Wrote strategy `FWR.py` by following the logic [here](https://www.investopedia.com/articles/technical/02/052102.asp). The initial result didn't beat SMACross strategy. I added a simple stop loss at 2% to to Four Week Rule to maintain profit.
+
+The final result of four week rule strategy is here:
+![image](./report/BTC_USDT_1h_FWR_0.02_2020-01-01_2020-04-01.png)
+
+[btreport here](./report/BTC_USDT_1h_FWR_0.02_2020-01-01_2020-04-01.pdf)
+
+Explored backtrader's github repo, looked into [indicators](https://github.com/mementum/backtrader/tree/master/backtrader/indicators). I used to trade crypto using Ichimoku cloud, so I decided to try out this strategy as an exercise. 
+
+Wrote `IchimokuStrategy.py` followed the trading idea on [stockchart](https://school.stockcharts.com/doku.php?id=technical_indicators:ichimoku_cloud)
+
+The strategy didn't go well at first, but after a stop loss added, it out-performed SMA.
+
+![image](./report/BTC_USDT_1h_IchimokuStrat_9_26_52_26_26_0.02_2020-01-01_2020-04-01.png)
+
+[bt report here](./report/BTC_USDT_1h_IchimokuStrat_9_26_52_26_26_0.02_2020-01-01_2020-04-01.pdf)
+

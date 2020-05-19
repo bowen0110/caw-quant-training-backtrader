@@ -4,27 +4,15 @@ import sys  # To find out the script name (in argv[0])
 
 # Import the backtrader platform
 import backtrader as bt
-import backtrader.feeds as btfeeds
 import backtrader.indicators as btind
 
-import pandas as pd
-import matplotlib.pyplot as plt
-
-datadir = './data'  # data path
-logdir = './log'  # log path
-reportdir = './report'  # report path
-tradingpair = 'BTC_USDT' # trading pair
-freq  = '1h' # trading frequency
-datafile = f'{tradingpair}_{freq}.csv'  # data file
-from_datetime = '2020-01-01 00:00:00'  # start time
-to_datetime = '2020-04-01 00:00:00'  # end time
 
 
 # Create a Stratey
 class SMACross(bt.Strategy):
     params = (
-        ('pfast', 50),
-        ('pslow', 200),
+        ('pfast', 10),
+        ('pslow', 20),
     )
 
     def log(self, txt, dt=None):
@@ -45,8 +33,6 @@ class SMACross(bt.Strategy):
         self.sma10 = btind.SimpleMovingAverage(self.datas[0], period=self.p.pfast)
         self.sma20 = btind.SimpleMovingAverage(self.datas[0], period=self.p.pslow)
         self.crossover = btind.CrossOver(self.sma10, self.sma20)  # crossover signal
-
-
 
 
     def notify_order(self, order):
@@ -116,55 +102,4 @@ class SMACross(bt.Strategy):
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
 
-
-if __name__ == '__main__':
-    # Create a cerebro entity
-    cerebro = bt.Cerebro()
-
-    # Add a strategy
-    cerebro.addstrategy(SMACross)
-
-    # Feed data
-    data = pd.read_csv(os.path.join(datadir, datafile),
-                       index_col='datetime', parse_dates=True)
-    data = data.loc[(data.index >= pd.to_datetime(from_datetime))
-                    & (data.index <= pd.to_datetime(to_datetime))]
-    datafeed = bt.feeds.PandasData(dataname=data)
-
-    # Add the Data Feed to Cerebro
-    cerebro.adddata(datafeed)
-
-    # Set our desired cash start
-    cerebro.broker.setcash(10000)
-
-    # Add a FixedSize sizer according to the stake
-    cerebro.addsizer(bt.sizers.PercentSizer, percents=99)
-
-    # Set the commission
-    cerebro.broker.setcommission(commission=0.001)
-
-    # config log file and fig file names
-    strategy_name = cerebro.strats[0][0][0].__name__
-    pfast = cerebro.strats[0][0][0].params.__dict__['pfast']
-    pslow = cerebro.strats[0][0][0].params.__dict__['pslow']
-    logfile = f'{tradingpair}_{freq}_{strategy_name}_{pfast}_{pslow}_2020-01-01_2020-04-01.csv' # log file
-    figfile = f'{tradingpair}_{freq}_{strategy_name}_{pfast}_{pslow}_2020-01-01_2020-04-01.png' # fig file
-
-    # Add loger
-    cerebro.addwriter(bt.WriterFile, out=os.path.join(
-        logdir, logfile), csv=True)
-
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Run over everything
-    cerebro.run()
-
-    # Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-    # Save report
-    plt.rcParams['figure.figsize'] = [13.8, 10]
-    fig = cerebro.plot(style='candlestick', barup='green', bardown='red')
-    fig[0][0].savefig(os.path.join(reportdir, figfile), dpi=480)
 
